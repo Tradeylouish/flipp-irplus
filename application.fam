@@ -10,8 +10,8 @@ App(
     # Optional values
     # fap_version="0.1",
     fap_icon="flipp-irplus_icon.png",  # 10x10 1-bit PNG
-    # fap_description="A simple app",
+    fap_description="App for connecting Flipper Zero to irplus LAN Android app over Bluetooth",
     fap_author="Louis Habberfield-Short",
-    # fap_weburl="https://github.com/user/template",
+    fap_weburl="https://github.com/Tradeylouish/flipp-irplus",
     fap_icon_assets="images",  # Image assets to compile for this application
 )
