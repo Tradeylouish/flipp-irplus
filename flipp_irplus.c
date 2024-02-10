@@ -1,6 +1,7 @@
 #include <furi.h>
 #include <furi_hal_bt.h>
 #include <furi_hal_bt_serial.h>
+#include <infrared_transmit.h>
 #include <bt/bt_service/bt.h>
 #include <gui/gui.h>
 #include <gui/icon_i.h>
@@ -154,6 +155,8 @@ static uint16_t bt_serial_event_callback(SerialServiceEvent event, void* context
     UNUSED(bt);
     uint16_t ret = 0;
 
+    //printf("Receiving a BT serial message: ");
+
     if(event.event == SerialServiceEventTypeDataReceived) {
         FURI_LOG_D(TAG, "SerialServiceEventTypeDataReceived");
         FURI_LOG_D(TAG, "Size: %u", event.data.size);
@@ -171,6 +174,30 @@ static uint16_t bt_serial_event_callback(SerialServiceEvent event, void* context
         }
         printf("\r\n");
     }
+
+    // Sending the received signal over IR
+
+    // Hard-coded signal for testing
+    //const uint32_t rawData[] = {
+    //    6212, 560, 1605, 560, 1498, 560, 1493, 560, 560}; // Using exact NEC timing
+
+    // Last two are stop bytes, so can leave out
+    const uint16_t numberOfDataElements = (event.data.size - 2) / 2;
+
+    uint32_t rawData[numberOfDataElements];
+
+    for(size_t i = 0; i < numberOfDataElements; i++) {
+        //Combine adjacent pairs of bytes by bitshifting
+        uint32_t firstByte = event.data.buffer[2 * i];
+        uint32_t secondByte = event.data.buffer[2 * i + 1];
+
+        rawData[i] = (firstByte << 8) | secondByte;
+        printf("%lX ", rawData[i]);
+    }
+    printf("\r\n");
+
+    infrared_send_raw_ext(rawData, sizeof(rawData) / sizeof(rawData[0]), true, 38000, 0.33);
+
     return ret;
 }
 
